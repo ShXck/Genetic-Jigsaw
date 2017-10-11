@@ -65,28 +65,49 @@ Mat Image_Handler::join_parts( ) {
 	}
 
 	int image_ctr = 0;
+	Mat _canvas = create_empty_img( d_container.base_image.cols, d_container.base_image.rows );
 
 	while( used_coords.size() != _coords.size() ) {
 		int r_index = util::random_int( 0, _coords.size() );
 		if( !util::contains_int( used_coords, r_index ) ) {
 			Mat curr_img = imread( std::to_string( image_ctr ) + ".jpg", IMREAD_COLOR );
 			std::pair<int,int> pos = _coords[r_index];
-			join( d_container.empty, curr_img, pos.first, pos.second );
+			join( _canvas, curr_img, pos.first, pos.second );
 			used_coords.push_back( r_index );
 			image_ctr++;
 		}
 	}
 
-	return d_container.empty;
+	return _canvas;
 }
 
 void Image_Handler::set_base( Mat image ) {
 	d_container.base_image = image;
-	d_container.empty = create_empty_img( d_container.base_image.cols, d_container.base_image.rows );
 }
 
 void Image_Handler::create_img( std::string path, Mat img ) {
 	imwrite( path, img );
+}
+
+bool Image_Handler::compare( Mat base, Mat other ) {
+	for( int i = 0; i < base.rows; i++ ) {
+		for( int j = 0; j < base.cols; j++ ) {
+			auto R_base = base.at<Vec3b>( i,j )[0];
+			auto R_other = other.at<Vec3b>( i,j )[0];
+			auto G_base = base.at<Vec3b>( i,j )[1];
+			auto G_other = other.at<Vec3b>( i,j )[1];
+			auto B_base = base.at<Vec3b>( i,j )[2];
+			auto B_other = other.at<Vec3b>( i,j )[2];
+			if( R_base != R_other && G_base != G_other && B_base != B_other ) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+Mat& Image_Handler::base() {
+	return d_container.base_image;
 }
 
 Image_Handler::~Image_Handler() { }

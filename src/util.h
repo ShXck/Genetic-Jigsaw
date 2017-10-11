@@ -1,5 +1,6 @@
 
 #include <random>
+#include <stdlib.h>
 
 namespace util {
 
@@ -10,7 +11,15 @@ namespace util {
 	 */
 	int random_int( int min, int max );
 
+	/**
+	 * Revisa si un vector contiene cierto número entero-
+	 * @param v el vector de enteros.
+	 * @param a el número que se quiere encontrar.
+	 * @return si el vector contiene el número o no.
+	 */
 	bool contains_int( std::vector<int> v, int a );
+
+
 
 } /* namespace util */
 

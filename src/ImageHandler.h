@@ -14,7 +14,6 @@ struct Data_Container {
 	int parts_height;
 	int total_parts;
 	Mat base_image;
-	Mat empty;
 };
 
 class Image_Handler {
@@ -69,7 +68,25 @@ public:
 	 */
 	void set_base( Mat image );
 
+	/**
+	 * Crea una imagen.
+	 * @param path el nombre y el espacio donde se guarda la imagen.
+	 * @param img la imagen que se quiere crear.
+	 */
 	void create_img( std::string path, Mat img );
+
+	/**
+	 * Compara dos imágenes y determina si son iguales.
+	 * @param base la imagen base.
+	 * @param sec la imagen que se quiere comparar.
+	 * @return si las imágenes son iguales o no.
+	 */
+	bool compare( Mat base, Mat other );
+
+	/**
+	 * @return La imagen base u original.
+	 */
+	Mat& base();
 
 	virtual ~Image_Handler();
 

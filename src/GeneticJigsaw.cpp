@@ -5,6 +5,7 @@
 #include <string>
 #include "gui/GUIApplication.h"
 #include "ImageHandler.h"
+#include "util.h"
 
 using namespace cv;
 
@@ -30,9 +31,6 @@ int main() {
 
 	h.split_image( image, 16 );
 
-	Mat r = h.join_parts();
-
-	h.create_img( "sols.jpg", r );
 
 	namedWindow("TEST WINDOW", WINDOW_AUTOSIZE);
 	imshow("TEST WINDOW", r );
