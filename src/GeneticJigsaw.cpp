@@ -39,41 +39,23 @@ int main() {
 		//h.create_img( "sol0.jpg", r );
 	}
 
-	Coords& _coords = h.coords();
-	float _result = 0.0f;
+	Mat a_s = imread( "sol1.jpg", IMREAD_COLOR );
+	Mat b_s = imread( "sol2.jpg", IMREAD_COLOR );
 
-	Mat curr_block;
-	Mat individual;
-	Mat sol_block;
+	G_Jigsaw jig( h );
+	Individual a( a_s, 0.0f );
+	Individual b( b_s, 0.0f );
 
-	for( int j = 0; j < 10; j++ ) {
-		individual = imread( "sol" + std::to_string( j ) + ".jpg", IMREAD_COLOR );;
-		for( unsigned int i = 0; i < _coords.size(); i++ ) {
-			auto curr_cords = _coords[i];
+	float af = jig.fitness_of( a._solution, a.s_genes );
+	float bf = jig.fitness_of( b._solution, b.s_genes );
 
-			Mat curr_block = h.crop( image, curr_cords.first,
-					curr_cords.second, h.img_details().parts_width
-					,h.img_details().parts_height, "tmp1" );
+	std::cout << "FIT A: " << af << " FIT B: " << bf << std::endl;
 
-			Mat sol_block = h.crop( individual, curr_cords.first,
-					curr_cords.second, h.img_details().parts_width
-					,h.img_details().parts_height, "tmp2" );
-
-			if( h.compare( curr_block, sol_block ) ) {
-				_result += 10.0f;
-			}
-
-			if( _result == 160.f ) {
-				std::cout << "RESULT!" << std::endl;
-			}
-		}
-
-		std::cout << "RESULT: " << j << " " << _result << std::endl;
-		_result = 0.0f;
-	}
 
 	namedWindow("TEST WINDOW", WINDOW_AUTOSIZE);
 	imshow("TEST WINDOW", image );
+	imshow("A", a_s );
+	imshow("B", b_s );
 
 	waitKey(0);
 

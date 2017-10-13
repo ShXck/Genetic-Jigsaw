@@ -10,28 +10,33 @@
 #include "ImageHandler.h"
 #include "util.h"
 
+typedef std::vector<std::pair<int,int>> Coords;
+typedef std::pair<int,int> coord;
+
 struct Individual {
 	Mat _solution;
 	float _fitness;
+	Coords s_genes;  // positions that match the original image.
 	Individual( Mat sol, float ftnss ) : _solution( sol ), _fitness( ftnss ) {}
 };
 
 typedef std::vector<Individual> Population;
-typedef std::vector<std::pair<int,int>> Coords;
 
 class G_Jigsaw {
 public:
 	G_Jigsaw();
+	G_Jigsaw( Image_Handler m_handler );
 	void run();
 	void restart();
+	int fitness_of( Mat individual, Coords& s_genes );
+	Image_Handler& handler();
 	virtual ~G_Jigsaw();
 private:
 	void start_population( );
 	void evolve();
-	int fitness_of( Mat individual );
-	Mat select_individual();
-	void crossover( Mat& img1, Mat& img2 );
-	void mutate( Mat& individual );
+	Individual select_individual();
+	void crossover( Individual& img1, Individual& img2 );
+	void mutate( Individual& individual );
 private:
 	Image_Handler img_handler;
 	Population _population;

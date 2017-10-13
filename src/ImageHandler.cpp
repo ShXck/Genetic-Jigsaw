@@ -46,6 +46,12 @@ Mat Image_Handler::create_empty_img( int width, int height, std::string name ) {
 	return empty_img;
 }
 
+Mat Image_Handler::create_empty_img( std::string name ) {
+	Mat empty_img( d_container.base_image.rows,  d_container.base_image.cols, CV_8UC3, Scalar( 0,0,0 ) );
+	imwrite( name + ".jpg", empty_img );
+	return empty_img;
+}
+
 Mat Image_Handler::join_parts( ) {
 
 	std::vector<int> used_coords;
@@ -100,6 +106,24 @@ bool Image_Handler::compare( const Mat& base, const Mat& other ) {
 	if( _similarity < 0.09 ) return true;
 
 	return false;
+}
+
+coord* Image_Handler::position_of( Mat base, Mat& cropped ) {
+	for( auto& coord : _coords ) {
+		Mat base_roi = crop( base, coord.first, coord.second, d_container.parts_width, d_container.parts_height, "tmp5" );
+		if( compare( base_roi, cropped ) ) {
+			return &coord;
+		}
+	}
+	return nullptr;
+}
+
+void Image_Handler::switch_parts( coord from, coord to, Mat& img ) {
+	Mat p_from = crop( img, from.first, from.second, d_container.parts_width, d_container.parts_height, "tmp5" );
+	Mat p_to = crop( img, to.first, to.second, d_container.parts_width, d_container.parts_height, "tmp6" );
+
+	join( img, p_from, to.first, to.second );
+	join( img, p_to, from.first, from.second );
 }
 
 Mat& Image_Handler::base() {

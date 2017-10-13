@@ -18,6 +18,7 @@ struct Data_Container {
 };
 
 typedef std::vector<std::pair<int,int>> Coords;
+typedef std::pair<int,int> coord;
 
 class Image_Handler {
 public:
@@ -56,6 +57,12 @@ public:
 	Mat create_empty_img( int width, int height, std::string name = "empty" );
 
 	/**
+	 * Crea una imagen vacía con fondo negro con los valores preestablecidos.
+	 * @return la imagen vacía construida.
+	 */
+	Mat create_empty_img( std::string name );
+
+	/**
 	 * Junta aleatoriamente las partes generadas en una imagen vacía.
 	 * @param empty_pic la imagen vacía.
 	 * @param part_width el ancho de cada parte.
@@ -85,6 +92,22 @@ public:
 	 * @return si las imágenes son iguales o no.
 	 */
 	bool compare( const Mat& base, const Mat& other );
+
+	/**
+	 * Encuentra la posición de una pieza de imagen en una imagen base.
+	 * @param base la imagen donde se quiere buscar.
+	 * @param cropped la imagen cortada.
+	 * @return la posicion de la imagen cortada en la original.
+	 */
+	coord* position_of( Mat base, Mat& cropped );
+
+	/**
+	 * Intercambia la posición de dos piezas de imágenes.
+	 * @param from posición inicial.
+	 * @param to posición final.
+	 * @param img la imagen donde se ejecuta el intercambio.
+	 */
+	void switch_parts( coord from, coord to, Mat& img );
 
 	/**
 	 * @return La imagen base u original.

@@ -4,6 +4,11 @@ G_Jigsaw::G_Jigsaw( ) : total_fitness( 0.0f ), current_generation( 0 ), final_so
 	srand( (int)time(NULL) );
 }
 
+G_Jigsaw::G_Jigsaw( Image_Handler m_handler ) : total_fitness( 0.0f ), current_generation( 0 ), final_solution( nullptr ) {
+	srand( (int)time(NULL) );
+	img_handler = m_handler;
+}
+
 void G_Jigsaw::run() {
 
 	start_population( );
@@ -14,7 +19,7 @@ void G_Jigsaw::run() {
 		while( !_found ) {
 			for( int i = 0; i < POPULATION_SIZE; i++ ) {
 				Individual curr = _population[i];
-				curr._fitness = fitness_of( curr._solution );
+				curr._fitness = fitness_of( curr._solution, curr.s_genes );
 				total_fitness += curr._fitness;
 			}
 			for( int i = 0; i < POPULATION_SIZE; i++ ) {
@@ -45,16 +50,17 @@ void G_Jigsaw::evolve() {
 	int pop_ctr = 0;
 
 	while( pop_ctr < POPULATION_SIZE ) {
-		Mat offspring1 = select_individual();
-		Mat offspring2 = select_individual();
+
+		Individual offspring1 = select_individual();
+		Individual offspring2 = select_individual();
 
 		crossover( offspring1, offspring2 );
 
 		mutate( offspring1 );
 		mutate( offspring2 );
 
-		tmp_pop[pop_ctr++] = Individual( offspring1, 0.0f );
-		tmp_pop[pop_ctr++] = Individual( offspring2, 0.0f );
+		tmp_pop[pop_ctr++] = Individual( offspring1._solution, 0.0f );
+		tmp_pop[pop_ctr++] = Individual( offspring2._solution, 0.0f );
 	}
 
 	for( int i = 0; i < POPULATION_SIZE; i++ ) {
@@ -62,7 +68,6 @@ void G_Jigsaw::evolve() {
 	}
 
 	++current_generation;
-
 }
 
 void G_Jigsaw::start_population() {
@@ -74,7 +79,7 @@ void G_Jigsaw::start_population() {
 	}
 }
 
-int G_Jigsaw::fitness_of( Mat individual ) {
+int G_Jigsaw::fitness_of( Mat individual, Coords& s_genes ) {
 
 	Coords& _coords = img_handler.coords();
 	float _result = 0.0f;
@@ -85,15 +90,18 @@ int G_Jigsaw::fitness_of( Mat individual ) {
 		auto c = _coords[i];
 		Mat curr_roi = img_handler.crop( individual, c.first, c.second, img_handler.img_details().parts_width, img_handler.img_details().parts_height, "tmp" );
 		Mat base_roi = img_handler.crop( _base , c.first, c.second, img_handler.img_details().parts_width, img_handler.img_details().parts_height, "tmp1" );
-		if( img_handler.compare( curr_roi, base_roi ) ) _result += 10.0f;
+		if( img_handler.compare( curr_roi, base_roi ) ) {
+			_result += 10.0f;
+			s_genes.push_back( c );
+		}
 	}
 
-	if( _result == 160.0f ) return 999.0f;
+	if( _result == 160.f ) return 999.0f;
 
 	return _result;
 }
 
-Mat G_Jigsaw::select_individual() {
+Individual G_Jigsaw::select_individual() {
 
 	float _slice = (float)(RANDOM_NUM * total_fitness);
 	float curr_fitness = 0.0f;
@@ -101,18 +109,33 @@ Mat G_Jigsaw::select_individual() {
 	for( int i = 0; i < POPULATION_SIZE; i++ ) {
 		curr_fitness += _population[i]._fitness;
 		if( curr_fitness >= _slice ) {
-			return _population[i]._solution;
+			return _population[i];
 		}
 	}
 
-	return img_handler.create_empty_img( 10, 10, "empty" );
+	return _population[0];
 }
 
-void G_Jigsaw::crossover( Mat& img1, Mat& img2 ) {
+void G_Jigsaw::crossover( Individual& img1, Individual& img2 ) {
 
+	Coords& _coords = img_handler.coords();
+
+	if( RANDOM_NUM < CROSSOVER_RATE ) {
+		for( auto c1 : img1.s_genes ) {
+			Mat tmp = img_handler.crop( img1._solution, c1.first, c1.second, img_handler.img_details().parts_width, img_handler.img_details().parts_height, "tmp" );
+			coord* pos = img_handler.position_of( img2._solution, tmp );
+			img_handler.switch_parts( *pos, c1, img2._solution );
+		}
+
+		for( auto c2 : img2.s_genes ) {
+			Mat tmp = img_handler.crop( img2._solution, c2.first, c2.second, img_handler.img_details().parts_width, img_handler.img_details().parts_height, "tmp" );
+			coord* pos = img_handler.position_of( img1._solution, tmp );
+			img_handler.switch_parts( *pos, c2, img1._solution );
+		}
+	}
 }
 
-void G_Jigsaw::mutate( Mat& individual ) {
+void G_Jigsaw::mutate( Individual& individual ) {
 
 }
 
@@ -120,6 +143,10 @@ void G_Jigsaw::restart() {
 	_population.clear();
 	total_fitness = 0.0f;
 	current_generation = 0;
+}
+
+Image_Handler& G_Jigsaw::handler() {
+	return img_handler;
 }
 
 G_Jigsaw::~G_Jigsaw() { }
