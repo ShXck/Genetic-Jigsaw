@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include "util.h"
+#include <thread>
 
 using namespace cv;
 
@@ -15,6 +16,8 @@ struct Data_Container {
 	int total_parts;
 	Mat base_image;
 };
+
+typedef std::vector<std::pair<int,int>> Coords;
 
 class Image_Handler {
 public:
@@ -81,17 +84,28 @@ public:
 	 * @param sec la imagen que se quiere comparar.
 	 * @return si las imágenes son iguales o no.
 	 */
-	bool compare( Mat base, Mat other );
+	bool compare( const Mat& base, const Mat& other );
 
 	/**
 	 * @return La imagen base u original.
 	 */
 	Mat& base();
 
+	/**
+	 * @return Las posiciones que se pueden manejar en la imagen.
+	 */
+	Coords& coords();
+
+	/**
+	 * @return Los detalles de la imagen base.
+	 */
+	Data_Container& img_details();
+
 	virtual ~Image_Handler();
 
 private:
 	Data_Container d_container;
+	Coords _coords;
 };
 
 #endif /* IMAGEHANDLER_H_ */

@@ -17,6 +17,7 @@ struct Individual {
 };
 
 typedef std::vector<Individual> Population;
+typedef std::vector<std::pair<int,int>> Coords;
 
 class G_Jigsaw {
 public:
@@ -25,19 +26,18 @@ public:
 	void restart();
 	virtual ~G_Jigsaw();
 private:
-	void evolve();
 	void start_population( );
-	void generate_population( int n_individual );
+	void evolve();
 	int fitness_of( Mat individual );
 	Mat select_individual();
 	void crossover( Mat& img1, Mat& img2 );
 	void mutate( Mat& individual );
 private:
-	Image_Handler m_handler;
+	Image_Handler img_handler;
 	Population _population;
-	Individual* final_solution;
 	float total_fitness;
 	unsigned int current_generation;
+	Individual* final_solution;
 };
 
 #endif /* GJIGSAW_H_ */

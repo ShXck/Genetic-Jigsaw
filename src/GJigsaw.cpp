@@ -2,7 +2,6 @@
 
 G_Jigsaw::G_Jigsaw( ) : total_fitness( 0.0f ), current_generation( 0 ), final_solution( nullptr ) {
 	srand( (int)time(NULL) );
-	_population.resize( POPULATION_SIZE );
 }
 
 void G_Jigsaw::run() {
@@ -42,7 +41,6 @@ void G_Jigsaw::run() {
 void G_Jigsaw::evolve() {
 
 	Population tmp_pop;
-	tmp_pop.resize( POPULATION_SIZE );
 
 	int pop_ctr = 0;
 
@@ -70,22 +68,44 @@ void G_Jigsaw::evolve() {
 void G_Jigsaw::start_population() {
 	Mat r;
 	for( int i = 0; i < POPULATION_SIZE; i++ ) {
-		r = m_handler.join_parts();
-		m_handler.create_img( "sol" +  std::to_string( i ) + ".jpg", r );
+		r = img_handler.join_parts();
+		img_handler.create_img( "sol" +  std::to_string( i ) + ".jpg", r );
 		_population.push_back( Individual( r, 0.0f ) );
 	}
 }
 
-void G_Jigsaw::generate_population( int n_individuals ) {
-
-}
-
 int G_Jigsaw::fitness_of( Mat individual ) {
-	return 0;
+
+	Coords& _coords = img_handler.coords();
+	float _result = 0.0f;
+
+	Mat& _base = img_handler.base();
+
+	for( unsigned int i = 0; i < _coords.size(); i++ ) {
+		auto c = _coords[i];
+		Mat curr_roi = img_handler.crop( individual, c.first, c.second, img_handler.img_details().parts_width, img_handler.img_details().parts_height, "tmp" );
+		Mat base_roi = img_handler.crop( _base , c.first, c.second, img_handler.img_details().parts_width, img_handler.img_details().parts_height, "tmp1" );
+		if( img_handler.compare( curr_roi, base_roi ) ) _result += 10.0f;
+	}
+
+	if( _result == 160.0f ) return 999.0f;
+
+	return _result;
 }
 
 Mat G_Jigsaw::select_individual() {
 
+	float _slice = (float)(RANDOM_NUM * total_fitness);
+	float curr_fitness = 0.0f;
+
+	for( int i = 0; i < POPULATION_SIZE; i++ ) {
+		curr_fitness += _population[i]._fitness;
+		if( curr_fitness >= _slice ) {
+			return _population[i]._solution;
+		}
+	}
+
+	return img_handler.create_empty_img( 10, 10, "empty" );
 }
 
 void G_Jigsaw::crossover( Mat& img1, Mat& img2 ) {
