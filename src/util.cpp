@@ -11,6 +11,13 @@ namespace util {
 		return dist( gen );
 	}
 
+	float random_float( int min, int max ) {
+	    std::random_device e;
+	    std::mt19937 gen( e() );
+	    std::uniform_real_distribution<> dis( min, max );
+	    return dis(e);
+	}
+
 	bool contains_int( std::vector<int> v, int a ) {
 		if( std::find( v.begin(), v.end(), a ) != v.end() ) {
 			return true;

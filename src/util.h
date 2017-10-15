@@ -12,6 +12,14 @@ namespace util {
 	int random_int( int min, int max );
 
 	/**
+	 * Genera un decimal aleatorio.
+	 * @param min límite inferior.
+	 * @param max límite superior.
+	 * @return un valor dentro de los límites.
+	 */
+	float random_float( int min, int max );
+
+	/**
 	 * Revisa si un vector contiene cierto número entero-
 	 * @param v el vector de enteros.
 	 * @param a el número que se quiere encontrar.

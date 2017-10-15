@@ -101,6 +101,8 @@ public:
 	 */
 	coord* position_of( Mat base, Mat& cropped );
 
+	bool contains( Mat base, Mat& cropped );
+
 	/**
 	 * Intercambia la posición de dos piezas de imágenes.
 	 * @param from posición inicial.
@@ -108,6 +110,11 @@ public:
 	 * @param img la imagen donde se ejecuta el intercambio.
 	 */
 	void switch_parts( coord from, coord to, Mat& img );
+
+	/**
+	 * Asigna las coordenadas que se pueden manejar en la imagen.
+	 */
+	void set_img_cords();
 
 	/**
 	 * @return La imagen base u original.

@@ -1,5 +1,5 @@
 src/GeneticJigsaw.o: ../src/GeneticJigsaw.cpp ../src/gui/GUIApplication.h \
- ../src/ImageHandler.h ../src/util.h ../src/GJigsaw.h
+ ../src/ImageHandler.h ../src/util.h ../src/Jigsaw.h
 
 ../src/gui/GUIApplication.h:
 
@@ -7,4 +7,4 @@ src/GeneticJigsaw.o: ../src/GeneticJigsaw.cpp ../src/gui/GUIApplication.h \
 
 ../src/util.h:
 
-../src/GJigsaw.h:
+../src/Jigsaw.h:

@@ -1,11 +1,10 @@
-#ifndef GJIGSAW_H_
-#define GJIGSAW_H_
+#ifndef JIGSAW_H_
+#define JIGSAW_H_
 
-#define POPULATION_SIZE 10
-#define CROSSOVER_RATE 0.7
-#define MUTATION_RATE 0.001
-#define MAX_GENERATIONS 400
-#define RANDOM_NUM ((float)rand()/(RAND_MAX+1))
+#define POPULATION_SIZE 20
+#define CROSSOVER_RATE 0.8
+#define MUTATION_RATE 0.009
+#define MAX_GENERATIONS 1000
 
 #include "ImageHandler.h"
 #include "util.h"
@@ -16,27 +15,27 @@ typedef std::pair<int,int> coord;
 struct Individual {
 	Mat _solution;
 	float _fitness;
-	Coords s_genes;  // positions that match the original image.
 	Individual( Mat sol, float ftnss ) : _solution( sol ), _fitness( ftnss ) {}
 };
 
 typedef std::vector<Individual> Population;
 
-class G_Jigsaw {
+class Jigsaw {
 public:
-	G_Jigsaw();
-	G_Jigsaw( Image_Handler m_handler );
+	Jigsaw();
+	Jigsaw( Image_Handler m_handler );
+	void start_population( );
 	void run();
 	void restart();
-	int fitness_of( Mat individual, Coords& s_genes );
 	Image_Handler& handler();
-	virtual ~G_Jigsaw();
+	virtual ~Jigsaw();
 private:
-	void start_population( );
 	void evolve();
+	int fitness_of( Mat individual );
 	Individual select_individual();
-	void crossover( Individual& img1, Individual& img2 );
+	Individual crossover( Individual& img1, Individual& img2 );
 	void mutate( Individual& individual );
+	void update_sols();
 private:
 	Image_Handler img_handler;
 	Population _population;
@@ -45,4 +44,4 @@ private:
 	Individual* final_solution;
 };
 
-#endif /* GJIGSAW_H_ */
+#endif /* JIGSAW_H_ */

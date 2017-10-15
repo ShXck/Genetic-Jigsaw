@@ -10,8 +10,6 @@ Mat Image_Handler::crop( Mat image, int x, int y, int width, int height, std::st
 
 	_roi.copyTo( cropped_img );
 
-	imwrite( name + ".jpg", cropped_img);
-
 	return cropped_img;
 }
 
@@ -42,34 +40,17 @@ void Image_Handler::split_image( Mat& image, int parts ) {
 
 Mat Image_Handler::create_empty_img( int width, int height, std::string name ) {
 	Mat empty_img( height, width, CV_8UC3, Scalar( 0,0,0 ) );
-	imwrite( name + ".jpg", empty_img );
 	return empty_img;
 }
 
 Mat Image_Handler::create_empty_img( std::string name ) {
 	Mat empty_img( d_container.base_image.rows,  d_container.base_image.cols, CV_8UC3, Scalar( 0,0,0 ) );
-	imwrite( name + ".jpg", empty_img );
 	return empty_img;
 }
 
 Mat Image_Handler::join_parts( ) {
 
 	std::vector<int> used_coords;
-
-	if( _coords.empty() ) {
-		int curr_x = 0; int curr_y = 0;
-
-		int n = std::sqrt( d_container.total_parts );
-
-		for( int i = 0; i < n; i++ ) {
-			for( int j = 0; j < n; j++ ) {
-				_coords.push_back( std::pair<int,int>( curr_x, curr_y ) );
-				curr_x += d_container.parts_width;
-			}
-			curr_x = 0;
-			curr_y += d_container.parts_height;
-		}
-	}
 
 	int image_ctr = 0;
 	Mat _canvas = create_empty_img( d_container.base_image.cols, d_container.base_image.rows );
@@ -118,12 +99,39 @@ coord* Image_Handler::position_of( Mat base, Mat& cropped ) {
 	return nullptr;
 }
 
+bool Image_Handler::contains( Mat base, Mat& cropped ) {
+	for( auto& coord : _coords ) {
+		Mat base_roi = crop( base, coord.first, coord.second, d_container.parts_width, d_container.parts_height, "tmp5" );
+		if( compare( base_roi, cropped ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Image_Handler::switch_parts( coord from, coord to, Mat& img ) {
 	Mat p_from = crop( img, from.first, from.second, d_container.parts_width, d_container.parts_height, "tmp5" );
 	Mat p_to = crop( img, to.first, to.second, d_container.parts_width, d_container.parts_height, "tmp6" );
 
 	join( img, p_from, to.first, to.second );
 	join( img, p_to, from.first, from.second );
+}
+
+void Image_Handler::set_img_cords() {
+	if( _coords.empty() ) {
+		int curr_x = 0; int curr_y = 0;
+
+		int n = std::sqrt( d_container.total_parts );
+
+		for( int i = 0; i < n; i++ ) {
+			for( int j = 0; j < n; j++ ) {
+				_coords.push_back( std::pair<int,int>( curr_x, curr_y ) );
+				curr_x += d_container.parts_width;
+			}
+			curr_x = 0;
+			curr_y += d_container.parts_height;
+		}
+	}
 }
 
 Mat& Image_Handler::base() {

@@ -5,14 +5,13 @@
 #include <string>
 #include "gui/GUIApplication.h"
 #include "ImageHandler.h"
-#include "GJigsaw.h"
+#include "Jigsaw.h"
 #include "util.h"
 
 using namespace cv;
 
 
 int main() {
-
 
 	Image_Handler h;
 
@@ -31,31 +30,35 @@ int main() {
 
 	h.split_image( image, 16 );
 
-	Mat r;
+	h.set_img_cords();
+
+	Jigsaw _jig( h );
+
+	_jig.start_population();
+	_jig.run();
+
+	/*Mat sol_1 = imread( "sol0.jpg", IMREAD_COLOR );
+	Mat sol_2 = imread( "sol1.jpg", IMREAD_COLOR );
+
+	Individual a( sol_1, 0.0f );
+	Individual b( sol_2, 0.0f );
+
+	Mat off = _jig.crossover( a, b )._solution;
+
+	imshow( "OFFSPRING", off );
+	imshow( "A", sol_1 );
+	imshow( "B", sol_2 );*/
+
+	/*Mat r;
 
 	for( int i = 0; i < 10; i++ ) {
 		r = h.join_parts();
 		h.create_img( "sol" + std::to_string( i ) + ".jpg", r );
 		//h.create_img( "sol0.jpg", r );
-	}
-
-	Mat a_s = imread( "sol1.jpg", IMREAD_COLOR );
-	Mat b_s = imread( "sol2.jpg", IMREAD_COLOR );
-
-	G_Jigsaw jig( h );
-	Individual a( a_s, 0.0f );
-	Individual b( b_s, 0.0f );
-
-	float af = jig.fitness_of( a._solution, a.s_genes );
-	float bf = jig.fitness_of( b._solution, b.s_genes );
-
-	std::cout << "FIT A: " << af << " FIT B: " << bf << std::endl;
-
+	}*/
 
 	namedWindow("TEST WINDOW", WINDOW_AUTOSIZE);
 	imshow("TEST WINDOW", image );
-	imshow("A", a_s );
-	imshow("B", b_s );
 
 	waitKey(0);
 

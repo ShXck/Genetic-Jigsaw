@@ -4,21 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/GJigsaw.cpp \
 ../src/GeneticJigsaw.cpp \
 ../src/ImageHandler.cpp \
+../src/Jigsaw.cpp \
 ../src/util.cpp 
 
 OBJS += \
-./src/GJigsaw.o \
 ./src/GeneticJigsaw.o \
 ./src/ImageHandler.o \
+./src/Jigsaw.o \
 ./src/util.o 
 
 CPP_DEPS += \
-./src/GJigsaw.d \
 ./src/GeneticJigsaw.d \
 ./src/ImageHandler.d \
+./src/Jigsaw.d \
 ./src/util.d 
 
 
