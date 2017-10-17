@@ -1,34 +1,48 @@
 #include "GUIApplication.h"
 
-GUIApplication::GUIApplication() {
+GUIApplication::GUIApplication( Image_Handler handler ) : _jigsaw( handler ) {
 	init();
 }
 
 void GUIApplication::run() {
 
-	while( m_window.isOpen() ) {
+	while( _window.isOpen() ) {
 
 		sf::Event _event;
 
-		while( m_window.pollEvent( _event ) ) {
-			switch( _event.type ) {
-				case sf::Event::Closed: {
-					m_window.close();
-					break;
-				}
-			}
+		while( _window.pollEvent( _event ) ) {
+			handle_events( _event );
 		}
-
-		m_window.clear();
-		// window draw something.
-		m_window.display();
+		_window.clear();
+		draw();
+		_window.display();
 	}
 
 }
 
 void GUIApplication::init() {
-	m_window.create( { WINDOW_WIDTH, WINDOW_HEIGHT }, "Genetic Jigsaw", sf::Style::Close );
-	m_window.setFramerateLimit( 60 );
+	_window.create( { WINDOW_WIDTH, WINDOW_HEIGHT }, "Genetic Jigsaw", sf::Style::Close );
+	_window.setFramerateLimit( 60 );
+}
+
+void GUIApplication::handle_events( const sf::Event& e ) {
+	switch( e.type ) {
+		case sf::Event::Closed: {
+			_window.close();
+			break;
+		}
+	}
+
+	switch( e.key.code ) {
+		case sf::Mouse::Left: {
+			std::cout << "LEFT!" << std::endl;
+			break;
+		}
+	}
+}
+
+void GUIApplication::draw() {
+
 }
 
 GUIApplication::~GUIApplication() { }

@@ -27,6 +27,7 @@ public:
 	void start_population( );
 	void run();
 	void restart();
+	const int& generation() const;
 	Image_Handler& handler();
 	virtual ~Jigsaw();
 private:

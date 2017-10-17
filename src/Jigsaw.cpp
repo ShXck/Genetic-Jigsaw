@@ -147,9 +147,7 @@ Individual Jigsaw::crossover( Individual& img1, Individual& img2 ) {
 				blank_index++;
 			}
 		}
-
 		return Individual( new_ind, 0.0f );
-
 	}
 	return img1;
 }
@@ -180,6 +178,10 @@ void Jigsaw::update_sols() {
 	for( unsigned int i = 0; i < _population.size(); i++ ) {
 		img_handler.create_img( "sol" + std::to_string( i ) + ".jpg", _population[i]._solution );
 	}
+}
+
+const int& Jigsaw::generation() const {
+	return current_generation;
 }
 
 Image_Handler& Jigsaw::handler() {
