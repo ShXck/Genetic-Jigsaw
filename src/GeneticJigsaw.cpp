@@ -7,13 +7,13 @@
 #include "ImageHandler.h"
 #include "Jigsaw.h"
 #include "util.h"
+#include <thread>
 
 using namespace cv;
 
-
 int main() {
 
-	Image_Handler h;
+	Image_Handler image_handler;
 
 	std::string img_name("assets/test.jpg");
 
@@ -26,25 +26,31 @@ int main() {
 		return -1;
 	}
 
-	h.set_base( image );
+	image_handler.set_base( image );
 
-	h.split_image( image, 16 );
+	std::string _parts;
+	int int_parts;
 
-	h.set_img_cords();
+	while( true ) {
 
-	GUIApplication gui_app( h );
+		std::cout << "Número de partes: ";
+		std::getline( std::cin, _parts );
+		int_parts = std::stoi( _parts );
+		if( int_parts == 4 || int_parts == 9 || int_parts == 16 ) {
+			std::cout << std::endl;
+			break;
+		} else {
+			int_parts = 0;
+		}
+	}
+
+	image_handler.split_image( image, int_parts );
+
+	image_handler.set_img_cords();
+
+	GUIApplication gui_app( image_handler );
+	gui_app.load_images();
 	gui_app.run();
-
-
-	/*Jigsaw _jig( h );
-
-	_jig.start_population();
-	_jig.run();*/
-
-	namedWindow("TEST WINDOW", WINDOW_AUTOSIZE);
-	imshow("TEST WINDOW", image );
-
-	waitKey(0);
 
 	return 0;
 }

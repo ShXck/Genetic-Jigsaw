@@ -25,7 +25,8 @@ void Image_Handler::split_image( Mat& image, int parts ) {
 
 	for( int i = 0; i < n; i++ ) {
 		for( int j = 0; j < n; j++ ) {
-			crop( image, curr_x, curr_y, new_width, new_height, std::to_string( name_ctr ) );
+			Mat c = crop( image, curr_x, curr_y, new_width, new_height, std::to_string( name_ctr ) );
+			create_img( std::to_string( name_ctr ) + ".jpg", c );
 			curr_x += new_width;
 			name_ctr++;
 		}
@@ -118,6 +119,7 @@ void Image_Handler::switch_parts( coord from, coord to, Mat& img ) {
 }
 
 void Image_Handler::set_img_cords() {
+
 	if( _coords.empty() ) {
 		int curr_x = 0; int curr_y = 0;
 
@@ -145,6 +147,7 @@ Coords& Image_Handler::coords() {
 Data_Container& Image_Handler::img_details() {
 	return d_container;
 }
+
 
 Image_Handler::~Image_Handler() { }
 

@@ -4,12 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/gui/AssetManager.cpp \
 ../src/gui/GUIApplication.cpp 
 
 OBJS += \
+./src/gui/AssetManager.o \
 ./src/gui/GUIApplication.o 
 
 CPP_DEPS += \
+./src/gui/AssetManager.d \
 ./src/gui/GUIApplication.d 
 
 

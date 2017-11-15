@@ -1,42 +1,55 @@
 #include "Jigsaw.h"
+#include <random>
 
-Jigsaw::Jigsaw( ) : total_fitness( 0.0f ), current_generation( 0 ), final_solution( nullptr ) { }
+Jigsaw::Jigsaw( ) : total_fitness( 0.0f ), current_generation( 0 ), final_solution( nullptr ) {
+	 goal_ftn = img_handler.img_details().total_parts * 10.f;
+}
 
 Jigsaw::Jigsaw( Image_Handler m_handler ) : total_fitness( 0.0f ), current_generation( 0 ), final_solution( nullptr ) {
 	img_handler = m_handler;
+	goal_ftn = img_handler.img_details().total_parts * 10.f;
 }
 
 void Jigsaw::run() {
 
+	_running = true;
+	_stopped = false;
+
 	bool _found = false;
 
-	while( !_found ) {
+	while( !_found && !_stopped ) {
 
-		total_fitness = 0.0f;
+		if( _running && !_paused ) {
 
-		for( int i = 0; i < POPULATION_SIZE; i++ ) {
-			Individual& curr = _population[i];
-			curr._fitness = fitness_of( curr._solution  );
-			total_fitness += curr._fitness;
-		}
+			total_fitness = 0.0f;
 
-		for( int i = 0; i < POPULATION_SIZE; i++ ) {
-			Individual& curr = _population[i];
-			if( curr._fitness == 999.0f ) {
-				std::cout << "SOLUTION FOUND!" <<  "GENERATION: " << current_generation <<  std::endl;
-				final_solution = &curr;
-				_found = true;
-				break;
+			for( int i = 0; i < POPULATION_SIZE; i++ ) {
+				Individual& curr = _population[i];
+				curr._fitness = fitness_of( curr._solution  );
+				total_fitness += curr._fitness;
 			}
-		}
 
-		evolve();
+			for( int i = 0; i < POPULATION_SIZE; i++ ) {
+				Individual& curr = _population[i];
+				if( curr._fitness == 999.0f ) {
+					std::cout << "SOLUTION FOUND!" <<  "GENERATION: " << current_generation <<  std::endl;
+					final_solution = &curr;
+					img_handler.create_img( "fit0.jpg", final_solution->_solution );
+					_found = true;
+					break;
+				}
+			}
 
-		if( current_generation > MAX_GENERATIONS ) {
-			std::cout << "NO SOLUTION FOUND THIS RUN!" << std::endl;
-			_found = true;
+			evolve();
+
+			if( current_generation > MAX_GENERATIONS ) {
+				std::cout << "NO SOLUTION FOUND THIS RUN!" << std::endl;
+				_found = true;
+			}
+			set_fittest();
 		}
 	}
+	set_fittest();
 	update_sols();
 }
 
@@ -92,7 +105,7 @@ int Jigsaw::fitness_of( Mat individual ) {
 		}
 	}
 
-	if( _result == 160.f ) return 999.0f;
+	if( _result == goal_ftn ) return 999.0f;
 
 	return _result;
 }
@@ -175,12 +188,67 @@ void Jigsaw::restart() {
 }
 
 void Jigsaw::update_sols() {
-	for( unsigned int i = 0; i < _population.size(); i++ ) {
-		img_handler.create_img( "sol" + std::to_string( i ) + ".jpg", _population[i]._solution );
+	while( !_stopped ) {
+		std::this_thread::sleep_for( std::chrono::seconds( 6 ) );
+		for( unsigned int i = 0; i < _population.size(); i++ ) {
+			img_handler.create_img( "sol" + std::to_string( i ) + ".jpg", _population[i]._solution );
+		}
 	}
 }
 
-const int& Jigsaw::generation() const {
+void Jigsaw::set_fittest() {
+
+	int _first, _second, _third;
+
+	_first = _second = _third = INT_MIN;
+
+	for( unsigned int i = 0; i < _population.size(); i++ ) {
+		if( (int)_population[i]._fitness > _first ) {
+			_third = _second;
+			_second = _first;
+			_first = i;
+		} else if( (int)_population[i]._fitness > _second ) {
+			_third = _second;
+			_second = i;
+		} else if( (int)_population[i]._fitness > _third ) {
+			_third = i;
+		}
+	}
+
+	 img_handler.create_img( "fit0.jpg", _population[_first]._solution );
+	 img_handler.create_img( "fit1.jpg", _population[_second]._solution );
+	 img_handler.create_img( "fit2.jpg", _population[_third]._solution );
+}
+
+void Jigsaw::pause() {
+	_paused = true;
+	_running = false;
+}
+
+void Jigsaw::stop() {
+	_stopped = true;
+	_running = false;
+	_paused = false;
+}
+
+void Jigsaw::continue_run() {
+	_running = true;
+	_paused = false;
+}
+
+const bool& Jigsaw::is_paused() const {
+	return _paused;
+}
+
+const bool& Jigsaw::is_running() const {
+	return _running;
+}
+
+const bool& Jigsaw::is_stopped() const {
+	return _stopped;
+}
+
+unsigned int Jigsaw::generation() {
 	return current_generation;
 }
 
